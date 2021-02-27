@@ -1,0 +1,39 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: greendeck-httpbin-service
+spec:
+  selector:
+    app: greendeck-httpbin-pod
+  ports:
+    - protocol: "TCP"
+      # Port accessible inside cluster
+      port: 8081
+      
+      # Port to forward to inside the pod
+      targetPort: 80
+
+      # Port accessible outside cluster
+      nodePort: 8082
+  type: LoadBalancer
+ 
+ 
+ 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greendeck-httpbin-template
+spec:
+  replicas: 5
+  template:
+    metadata:
+      labels:
+        app: greendeck-httpbin-pod
+    spec:
+      containers:
+        - name: greendeck-httpbin-pod
+          image: # to fill
+          ports:
+            - containerPort: 80
