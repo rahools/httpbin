@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: httpbin-template
+  name: httpbin-deployment
 spec:
   replicas: 2
   selector:
@@ -32,11 +32,11 @@ spec:
     - protocol: "TCP"
 
       # Port accessible inside cluster
-      port: 8090
+      port: 8080
       
       # Port to forward to inside the pod
       targetPort: 80
 
       # Port accessible outside cluster
-      nodePort: 30300
+      nodePort: 80
   type: LoadBalancer
