@@ -32,7 +32,7 @@ spec:
     - protocol: "TCP"
 
       # Port accessible inside cluster
-      port: 8080
+      port: 8899
       
       # Port to forward to inside the pod
       targetPort: 80
