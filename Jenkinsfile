@@ -1,9 +1,3 @@
-environment {
-    registry = "rahools/httpbin"
-    registryCred = 'dockerhub'
-    dockerImg = ''
-}   
-
 podTemplate(label: 'jenkins-agent-pod', containers: [
     containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'python', image: 'python', command: 'cat', ttyEnabled: true),
@@ -34,8 +28,8 @@ podTemplate(label: 'jenkins-agent-pod', containers: [
         stage('Build Image') {
             container('docker') {
                 script {
-                    dockerImg = docker.build registry
-                    docker.withRegistry('', registryCred) {
+                    dockerImg = docker.build "rahools/httpbin"
+                    docker.withRegistry('', 'dockerhub') {
                         dockerImg.push("$BUILD_ID")
                         dockerImg.push('latest')
                     }
