@@ -15,21 +15,6 @@ pipeline {
             }
         }
 
-        // Installs all the prerequisites needed for the unit test
-        stage('Install Test Prerequisites'){
-            steps {
-                sh 'pip install pipenv'
-                sh 'pipenv install --ignore-pipfile'
-            }
-        }
-
-        // Performs unit testing
-        stage('Unit Test'){
-            steps {
-                sh 'pipenv run python test_httpbin.py'
-            }
-        }
-
         // Builds Docker Image
         stage('Build Image') {
             steps {
