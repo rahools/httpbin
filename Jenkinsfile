@@ -18,7 +18,7 @@ pipeline {
         // Installs all the prerequisites needed for the unit test
         stage('Install Test Prerequisites'){
             steps {
-                sh 'sudo pip3 install pipenv'
+                sh 'pip3 install pipenv'
                 sh 'pipenv install --ignore-pipfile'
             }
         }
