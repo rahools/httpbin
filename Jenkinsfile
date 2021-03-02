@@ -1,6 +1,7 @@
 podTemplate(label: 'jenkins-agent-pod', containers: [
     containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
     containerTemplate(name: 'python', image: 'python', command: 'cat', ttyEnabled: true),
+    containerTemplate(name: 'kubectl', image: 'linkyard/kubectl', command: 'cat', ttyEnabled: true),
   ],
   volumes: [
     hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
@@ -39,16 +40,18 @@ podTemplate(label: 'jenkins-agent-pod', containers: [
 
         // Deploy to k8s
         stage('k8s Deploy') {
-            script {
-                step([
-                    $class: 'KubernetesEngineBuilder', 
-                    projectId: 'kube-test-306216', 
-                    clusterName: 'my-first-cluster-1', 
-                    location: 'us-central1-c', 
-                    manifestPattern: 'kube-config.yml', 
-                    credentialsId: 'gke', 
-                    verifyDeployments: true
-                ])
+            container('kubectl') {
+                script {
+                    step([
+                        $class: 'KubernetesEngineBuilder', 
+                        projectId: 'kube-test-306216', 
+                        clusterName: 'my-first-cluster-1', 
+                        location: 'us-central1-c', 
+                        manifestPattern: 'kube-config.yml', 
+                        credentialsId: 'gke', 
+                        verifyDeployments: true
+                    ])
+                }
             }
         }
     }
