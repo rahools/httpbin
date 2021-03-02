@@ -30,13 +30,6 @@ spec:
     app: httpbin-pod
   ports:
     - protocol: "TCP"
-
-      # Port accessible inside cluster
-      port: 8899
-      
-      # Port to forward to inside the pod
+      port: 80
       targetPort: 80
-
-      # Port accessible outside cluster
-      nodePort: 30300
   type: LoadBalancer
