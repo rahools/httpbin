@@ -1,13 +1,18 @@
-pipeline {
-    environment {
-        registry = "rahools/httpbin"
-        registryCred = 'dockerhub'
-        dockerImg = ''
-    }
+podTemplate(label: 'jenkins-agent-pod', containers: [
+    containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
+    containerTemplate(name: 'python', image: 'python', command: 'cat', ttyEnabled: true),
+  ],
+  volumes: [
+    hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
+  ]) {
+    node('jenkins-agent-pod') {
 
-	agent any
-    
-    stages {
+        environment {
+            registry = "rahools/httpbin"
+            registryCred = 'dockerhub'
+            dockerImg = ''
+        }
+
         // Gets the latest source code from the SCM
         stage('Clone Repository') {
             steps {
@@ -15,47 +20,27 @@ pipeline {
             }
         }
 
-        // Builds Docker Image
-        stage('Build Image') {
-            steps {
-                script {
-                    // sh "sudo docker build -t rahools/greendeck-httpbin:\"${BUILD_ID}\" ."
-                    // sh "sudo docker push rahools/greendeck-httpbin:\"${BUILD_ID}\""
+        // Perform Unit Test
+        stage('Unit Test') {
+            container('python') {
+                // Intsall deps
+                sh 'sudo pip3 install pipenv'
+                sh 'pipenv install --ignore-pipfile'
 
-                    dockerImg = docker.build registry
-                    docker.withRegistry('', registryCred) {
-                        dockerImg.push("$BUILD_ID")
-                        dockerImg.push('latest')
-                    }
-                }
+                // Run Tests
+                sh 'pipenv run python test_httpbin.py'
             }
         }
 
-        // Deploys the image as container
-        // stage('Run Image') {
-        //     steps {
-        //         script{
-        //             // Get last successful build ID
-        //             def SUCCESS_BUILD = 0
-        //             def build = currentBuild.previousBuild
-        //             while (build != null) {
-        //                 if (build.result == "SUCCESS")
-        //                 {
-        //                     SUCCESS_BUILD = build.id as Integer
-        //                     break
-        //                 }
-        //                 build = build.previousBuild
-        //             }
-
-        //             // Stop and remove previous container
-        //             sh "sudo docker rm -f httpbin-cont-\"${SUCCESS_BUILD}\" && echo \"container ${SUCCESS_BUILD} removed\" || echo \"container ${SUCCESS_BUILD} does not exist\""
-        //             sh 'sudo docker system prune -f'
-
-        //             // Run latest container
-        //             sh "sudo docker run -d -p 5050:80 --name httpbin-cont-\"${BUILD_ID}\" rahools/httpbin:\"${BUILD_ID}\""
-
-        //         }
-        //     }
-        // }
+        // Builds Docker Image
+        stage('Build Image') {
+            container('docker') {
+                dockerImg = docker.build registry
+                docker.withRegistry('', registryCred) {
+                    dockerImg.push("$BUILD_ID")
+                    dockerImg.push('latest')
+                }
+            }
+        }
     }
 }
