@@ -21,7 +21,7 @@ podTemplate(label: 'jenkins-agent-pod', containers: [
             container('python') {
                 script {
                     // Intsall deps
-                    sh 'sudo pip3 install pipenv'
+                    sh 'pip3 install pipenv'
                     sh 'pipenv install --ignore-pipfile'
 
                     // Run Tests
