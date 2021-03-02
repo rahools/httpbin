@@ -11,35 +11,35 @@ podTemplate(label: 'jenkins-agent-pod', containers: [
         // Gets the latest source code from the SCM
         checkout scm
 
-        // // Perform Unit Test
-        // stage('Unit Test') {
-        //     container('python') {
-        //         script {
-        //             // Intsall deps
-        //             sh 'pip3 install pipenv'
-        //             sh 'pipenv install --ignore-pipfile'
+        // Perform Unit Test
+        stage('Unit Test') {
+            container('python') {
+                script {
+                    // Intsall deps
+                    sh 'pip3 install pipenv'
+                    sh 'pipenv install --ignore-pipfile'
 
-        //             // Run Tests
-        //             sh 'pipenv run python test_httpbin.py'
-        //         }
-        //     }
-        // }
+                    // Run Tests
+                    sh 'pipenv run python test_httpbin.py'
+                }
+            }
+        }
 
-        // // Builds Docker Image
-        // stage('Build Image') {
-        //     container('docker') {
-        //         script {
-        //             dockerImg = docker.build "rahools/httpbin"
-        //             docker.withRegistry('', 'dockerhub') {
-        //                 dockerImg.push("$BUILD_ID")
-        //                 dockerImg.push('latest')
-        //             }
-        //         }
-        //     }
-        // }
+        // Builds Docker Image
+        stage('Build Image') {
+            container('docker') {
+                script {
+                    dockerImg = docker.build "rahools/httpbin"
+                    docker.withRegistry('', 'dockerhub') {
+                        dockerImg.push("$BUILD_ID")
+                        dockerImg.push('latest')
+                    }
+                }
+            }
+        }
 
         // Deploy to k8s
-        stage('k8s Deploy') {
+        stage('K8S Deploy') {
             container('kubectl') {
                 script {
                     step([
